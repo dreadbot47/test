@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Library Management System</h1>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="grid-layout">
+            <!-- Left Column: Add Book & Check Availability -->
+            <div class="sidebar">
+                <div class="card">
+                    <h2>Add New Book</h2>
+                    <form action="/add_book" method="POST">
+                        <div class="form-group">
+                            <label for="title">Title:</label>
+                            <input type="text" id="title" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="author">Author:</label>
+                            <input type="text" id="author" name="author" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Book</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>Check Availability</h2>
+                    <form action="/check_availability" method="POST">
+                        <div class="form-group">
+                            <label for="query">Book Title:</label>
+                            <input type="text" id="query" name="query" required>
+                        </div>
+                        <button type="submit" class="btn btn-secondary">Check Status</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Column: Book List & Search -->
+            <div class="main-content">
+                <div class="card">
+                    <div class="header-row">
+                        <h2>Book Collection</h2>
+                        <form action="/" method="GET" class="search-form">
+                            <input type="text" name="search" placeholder="Search by title/author...">
+                            <button type="submit" class="btn btn-search">Search</button>
+                        </form>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if books %}
+                                {% for book in books %}
+                                <tr>
+                                    <td>{{ book.title }}</td>
+                                    <td>{{ book.author }}</td>
+                                    <td>
+                                        <span class="badge {{ 'badge-available' if book.status == 'Available' else 'badge-borrowed' }}">
+                                            {{ book.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if book.status == 'Available' %}
+                                            <a href="/borrow_book/{{ book.id }}" class="btn btn-sm btn-warning">Borrow</a>
+                                        {% else %}
+                                            <a href="/return_book/{{ book.id }}" class="btn btn-sm btn-success">Return</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="no-books">No books found.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

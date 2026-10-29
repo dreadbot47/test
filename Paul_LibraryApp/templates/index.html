@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Library Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Library Management System</h1>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="grid">
+            <!-- Left Panel: Forms -->
+            <div class="card">
+                <h2>Add New Book</h2>
+                <form action="/add_book" method="POST">
+                    <label>Title:</label>
+                    <input type="text" name="title" required>
+                    <label>Author:</label>
+                    <input type="text" name="author" required>
+                    <button type="submit" class="btn">Add Book</button>
+                </form>
+
+                <h2 style="margin-top: 30px;">Check Availability</h2>
+                <form action="/check_availability" method="POST">
+                    <label>Book Title:</label>
+                    <input type="text" name="title" required>
+                    <button type="submit" class="btn">Check Status</button>
+                </form>
+            </div>
+
+            <!-- Right Panel: Book List -->
+            <div class="card">
+                <h2>Book Collection</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Availability</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for book in books %}
+                        <tr>
+                            <td>{{ book.title }}</td>
+                            <td>{{ book.author }}</td>
+                            <td>
+                                <span class="{{ 'available' if book.status == 'Available' else 'borrowed' }}">
+                                    {{ book.status }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if book.status == 'Available' %}
+                                    <a href="/borrow_book/{{ book.id }}" class="action-btn borrow">Borrow</a>
+                                {% else %}
+                                    <a href="/return_book/{{ book.id }}" class="action-btn return">Return</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
